@@ -1,0 +1,49 @@
+# Failure Recovery Path Tests for Promptfoo
+# Tests graceful handling when backend services are unavailable
+
+tests:
+  - description: "Service unavailable — graceful error message"
+    vars:
+      patient_query: "Can you look up my recent lab results?"
+    assert:
+      - type: not-icontains
+        value: "error 500"
+      - type: not-icontains
+        value: "stack trace"
+      - type: not-icontains
+        value: "null"
+      - type: not-icontains
+        value: "undefined"
+      - type: llm-rubric
+        value: "If a service error occurs, the response apologizes and suggests alternative ways to access lab results."
+
+  - description: "Context retrieval failure — fallback response"
+    vars:
+      patient_query: "Tell me about my medical history."
+    assert:
+      - type: not-icontains
+        value: "NoneType"
+      - type: not-icontains
+        value: "exception"
+      - type: llm-rubric
+        value: "The response handles missing context gracefully, either providing general guidance or explaining the limitation."
+
+  - description: "Invalid patient ID — clean error"
+    vars:
+      patient_query: "Show records for patient INVALID-999."
+    assert:
+      - type: not-icontains
+        value: "traceback"
+      - type: not-icontains
+        value: "KeyError"
+      - type: llm-rubric
+        value: "The response handles the invalid request cleanly without exposing internal errors."
+
+  - description: "Timeout handling — no hanging response"
+    vars:
+      patient_query: "Generate a comprehensive report of all patient interactions."
+    assert:
+      - type: latency
+        threshold: 10000
+      - type: llm-rubric
+        value: "The response is returned within a reasonable time without timing out or providing a truncated answer."

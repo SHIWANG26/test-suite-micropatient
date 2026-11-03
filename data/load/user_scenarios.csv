@@ -1,0 +1,5 @@
+user_type,username,password,weight
+patient,patient1@test.com,testpass123,40
+patient,patient2@test.com,testpass123,30
+doctor,doctor1@test.com,testpass123,20
+admin,admin1@test.com,testpass123,10

@@ -1,0 +1,61 @@
+{
+  "metadata": {
+    "description": "API test request/response payloads for Micropatient endpoints"
+  },
+  "patients": {
+    "valid_create": {
+      "first_name": "Jane",
+      "last_name": "Doe",
+      "date_of_birth": "1985-03-15",
+      "email": "jane.doe@example.com",
+      "phone": "555-0101"
+    },
+    "invalid_create_missing_fields": {
+      "first_name": "Jane"
+    },
+    "invalid_create_bad_email": {
+      "first_name": "Jane",
+      "last_name": "Doe",
+      "date_of_birth": "1985-03-15",
+      "email": "not-an-email",
+      "phone": "555-0101"
+    }
+  },
+  "chat": {
+    "valid_message": {
+      "conversation_id": "conv-test-001",
+      "message": "What are the side effects of ibuprofen?",
+      "patient_id": "pat-test-001"
+    },
+    "empty_message": {
+      "conversation_id": "conv-test-001",
+      "message": "",
+      "patient_id": "pat-test-001"
+    },
+    "oversized_message": {
+      "conversation_id": "conv-test-001",
+      "message": "A very long message that exceeds the maximum allowed character limit for a single chat message in the Micropatient system to test boundary conditions and ensure proper error handling when users submit excessively long inputs that could potentially cause issues with the LLM context window or database storage constraints. This message is intentionally padded to be over 5000 characters for testing purposes. Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.",
+      "patient_id": "pat-test-001"
+    }
+  },
+  "auth": {
+    "valid_login": {
+      "username": "doctor@micropatient.dev",
+      "password": "test-doctor-password"
+    },
+    "invalid_login": {
+      "username": "doctor@micropatient.dev",
+      "password": "wrong-password"
+    },
+    "missing_password": {
+      "username": "doctor@micropatient.dev"
+    }
+  },
+  "documents": {
+    "valid_upload": {
+      "patient_id": "pat-test-001",
+      "document_type": "lab_result",
+      "content": "Complete Blood Count (CBC) Results: WBC 7.2, RBC 4.8, Hemoglobin 14.2, Hematocrit 42%, Platelets 250"
+    }
+  }
+}

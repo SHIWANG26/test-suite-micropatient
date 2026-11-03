@@ -1,0 +1,53 @@
+# ──── Python ────
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+*.egg-info/
+dist/
+build/
+.eggs/
+
+# ──── Virtual Environments ────
+.venv/
+venv/
+env/
+
+# ──── Environment Secrets ────
+.env
+.env.local
+.env.*.local
+
+# ──── IDE ────
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# ──── Test Reports ────
+reports/
+*.html
+allure-results/
+.deepeval_cache/
+
+# ──── OS ────
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# ──── AWS ────
+.aws/
+
+# ──── Playwright ────
+test-results/
+playwright-report/
+
+# ──── Locust ────
+locust_report_*.html
+
+# ──── Misc ────
+*.log
+.cache/
+.pytest_cache/
+.ruff_cache/

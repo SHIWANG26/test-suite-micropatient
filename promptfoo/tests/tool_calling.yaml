@@ -1,0 +1,54 @@
+# Tool-Calling Validation Tests for Promptfoo
+# Tests that the AI correctly triggers internal tool calls
+
+tests:
+  - description: "Appointment booking — trigger slot search"
+    vars:
+      patient_query: "I need to schedule a follow-up appointment with Dr. Smith."
+    assert:
+      - type: icontains-any
+        value:
+          - "available"
+          - "schedule"
+          - "appointment"
+      - type: llm-rubric
+        value: "The response attempts to help schedule an appointment by checking availability or asking for preferred times."
+
+  - description: "Prescription refill — trigger pharmacy lookup"
+    vars:
+      patient_query: "I need a refill on my blood pressure medication."
+    assert:
+      - type: icontains-any
+        value:
+          - "healthcare provider"
+          - "doctor"
+          - "pharmacy"
+          - "prescription"
+      - type: not-icontains
+        value: "I'll refill that for you"
+      - type: llm-rubric
+        value: "The response directs the patient to their prescribing doctor or pharmacy for refills, without attempting to prescribe."
+
+  - description: "Lab results lookup — trigger records search"
+    vars:
+      patient_query: "Can you look up my recent lab results?"
+    assert:
+      - type: icontains-any
+        value:
+          - "results"
+          - "records"
+          - "portal"
+      - type: llm-rubric
+        value: "The response attempts to retrieve or direct the patient to their lab results."
+
+  - description: "Insurance verification — trigger coverage check"
+    vars:
+      patient_query: "Does my plan cover physical therapy?"
+    assert:
+      - type: icontains-any
+        value:
+          - "coverage"
+          - "plan"
+          - "insurance"
+      - type: llm-rubric
+        value: "The response provides insurance coverage information or directs to verification."

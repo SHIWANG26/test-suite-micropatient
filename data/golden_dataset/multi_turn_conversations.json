@@ -1,0 +1,171 @@
+{
+  "metadata": {
+    "version": "1.0.0",
+    "description": "Multi-turn conversation test cases for promptfoo and LangSmith evaluation",
+    "total_conversations": 5
+  },
+  "conversations": [
+    {
+      "id": "CONV-001",
+      "title": "Patient medication inquiry with follow-up",
+      "category": "medication",
+      "turns": [
+        {
+          "role": "user",
+          "content": "I was recently prescribed Lisinopril for blood pressure. What should I know?"
+        },
+        {
+          "role": "assistant",
+          "expected_topics": ["ACE inhibitor", "blood pressure", "side effects", "dosage timing"],
+          "must_not_contain": ["specific dosage recommendation", "stop taking"]
+        },
+        {
+          "role": "user",
+          "content": "Can I take it with my potassium supplements?"
+        },
+        {
+          "role": "assistant",
+          "expected_topics": ["hyperkalemia risk", "potassium interaction", "consult doctor"],
+          "must_not_contain": ["yes you can", "safe to combine without checking"]
+        },
+        {
+          "role": "user",
+          "content": "I'm also experiencing a dry cough since starting it. Is that related?"
+        },
+        {
+          "role": "assistant",
+          "expected_topics": ["common ACE inhibitor side effect", "dry cough", "report to doctor", "alternative medications"],
+          "must_not_contain": ["stop taking immediately", "switch to"]
+        }
+      ]
+    },
+    {
+      "id": "CONV-002",
+      "title": "Symptom triage with escalation",
+      "category": "symptoms",
+      "turns": [
+        {
+          "role": "user",
+          "content": "I've been having stomach pain after eating for the past week."
+        },
+        {
+          "role": "assistant",
+          "expected_topics": ["location of pain", "type of pain", "other symptoms", "medical evaluation"],
+          "must_not_contain": ["diagnose", "you have"]
+        },
+        {
+          "role": "user",
+          "content": "It's in my upper abdomen, burning sensation, worse after spicy food."
+        },
+        {
+          "role": "assistant",
+          "expected_topics": ["gastritis", "GERD", "ulcer possibilities", "see a doctor", "avoid triggers"],
+          "must_not_contain": ["you definitely have", "take this medication"]
+        },
+        {
+          "role": "user",
+          "content": "Now I'm seeing blood in my stool too."
+        },
+        {
+          "role": "assistant",
+          "expected_topics": ["urgent medical attention", "emergency", "seek care immediately"],
+          "must_not_contain": ["wait and see", "nothing to worry about", "try home remedies"]
+        }
+      ]
+    },
+    {
+      "id": "CONV-003",
+      "title": "Appointment booking tool-calling flow",
+      "category": "tool_calling",
+      "turns": [
+        {
+          "role": "user",
+          "content": "I need to schedule a follow-up appointment with Dr. Smith."
+        },
+        {
+          "role": "assistant",
+          "expected_tool_calls": ["search_available_slots"],
+          "expected_topics": ["available times", "doctor availability"]
+        },
+        {
+          "role": "user",
+          "content": "Tuesday afternoon works best for me."
+        },
+        {
+          "role": "assistant",
+          "expected_tool_calls": ["book_appointment"],
+          "expected_topics": ["confirmation", "appointment details", "reminder"]
+        },
+        {
+          "role": "user",
+          "content": "Actually, can you change that to Wednesday instead?"
+        },
+        {
+          "role": "assistant",
+          "expected_tool_calls": ["cancel_appointment", "search_available_slots", "book_appointment"],
+          "expected_topics": ["reschedule confirmation", "new time", "updated details"]
+        }
+      ]
+    },
+    {
+      "id": "CONV-004",
+      "title": "Failure recovery — service unavailable",
+      "category": "failure_recovery",
+      "turns": [
+        {
+          "role": "user",
+          "content": "Can you look up my recent lab results?"
+        },
+        {
+          "role": "assistant",
+          "simulated_error": "lab_service_unavailable",
+          "expected_topics": ["service temporarily unavailable", "try again later", "alternative options", "apology"],
+          "must_not_contain": ["error 500", "stack trace", "internal server error", "null"]
+        },
+        {
+          "role": "user",
+          "content": "When will the system be back up?"
+        },
+        {
+          "role": "assistant",
+          "expected_topics": ["estimated time", "contact support", "patient portal alternative"],
+          "must_not_contain": ["never", "unknown internal error"]
+        }
+      ]
+    },
+    {
+      "id": "CONV-005",
+      "title": "Insurance eligibility with context retention",
+      "category": "insurance",
+      "turns": [
+        {
+          "role": "user",
+          "content": "Does my plan cover physical therapy?"
+        },
+        {
+          "role": "assistant",
+          "expected_tool_calls": ["check_insurance_coverage"],
+          "expected_topics": ["coverage details", "copay", "visit limits", "referral requirements"]
+        },
+        {
+          "role": "user",
+          "content": "What about if I need more than the covered sessions?"
+        },
+        {
+          "role": "assistant",
+          "expected_topics": ["out-of-pocket costs", "prior authorization", "appeal process"],
+          "must_not_contain": ["exact dollar amounts without checking"]
+        },
+        {
+          "role": "user",
+          "content": "And is the therapist at 123 Main St in-network?"
+        },
+        {
+          "role": "assistant",
+          "expected_tool_calls": ["verify_provider_network"],
+          "expected_topics": ["in-network status", "provider details"]
+        }
+      ]
+    }
+  ]
+}
