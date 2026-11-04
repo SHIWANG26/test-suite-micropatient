@@ -9,9 +9,9 @@ import pytest
 from playwright.sync_api import Page
 
 from config.settings import get_settings
-from tests.ui.pages.login_page import LoginPage
-from tests.ui.pages.dashboard_page import DashboardPage
 from tests.ui.pages.chat_page import ChatPage
+from tests.ui.pages.dashboard_page import DashboardPage
+from tests.ui.pages.login_page import LoginPage
 from tests.ui.pages.patient_portal_page import PatientPortalPage
 
 

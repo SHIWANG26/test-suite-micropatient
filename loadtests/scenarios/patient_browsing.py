@@ -5,7 +5,7 @@ Models patients logging in, viewing their records, checking
 appointments, and browsing the portal — 20% of total traffic.
 """
 
-from locust import task, between
+from locust import between, task
 
 from loadtests.scenarios.api_stress import BaseAPIUser
 

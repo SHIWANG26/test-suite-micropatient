@@ -7,7 +7,7 @@ This is the most latency-sensitive scenario — 50% of total traffic.
 
 import random
 
-from locust import task, between
+from locust import between, task
 
 from loadtests.scenarios.api_stress import BaseAPIUser
 

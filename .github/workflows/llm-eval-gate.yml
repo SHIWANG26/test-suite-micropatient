@@ -30,6 +30,9 @@ jobs:
           python-version: '3.11'
           cache: 'pip'
 
+      - name: Create report directory
+        run: mkdir -p reports
+
       - name: Install dependencies
         run: pip install -e ".[dev]"
 

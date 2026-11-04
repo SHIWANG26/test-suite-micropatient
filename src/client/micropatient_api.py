@@ -92,7 +92,7 @@ class MicropatientAPIClient:
         return self._get(f"/api/v1/chat/conversations/{conversation_id}")
 
     def list_conversations(self, patient_id: str) -> dict:
-        return self._get(f"/api/v1/chat/conversations", params={"patient_id": patient_id})
+        return self._get("/api/v1/chat/conversations", params={"patient_id": patient_id})
 
     # ── Document Endpoints ──────────────────────
     def upload_document(self, patient_id: str, doc_type: str, content: str) -> dict:

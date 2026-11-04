@@ -9,9 +9,8 @@ from this class to avoid code duplication.
 from __future__ import annotations
 
 import logging
-from typing import Any
 
-from playwright.sync_api import Page, expect, Locator
+from playwright.sync_api import Locator, Page, expect
 
 logger = logging.getLogger(__name__)
 

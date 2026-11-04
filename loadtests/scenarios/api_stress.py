@@ -5,7 +5,7 @@ Models mixed API traffic from admin and doctor users performing
 CRUD operations — 30% of total traffic.
 """
 
-from locust import HttpUser, task, between, events
+from locust import HttpUser, between, task
 
 from loadtests.common.auth import get_auth_headers
 

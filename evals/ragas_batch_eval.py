@@ -12,8 +12,7 @@ from __future__ import annotations
 
 import json
 import logging
-import sys
-from datetime import datetime, timezone
+from datetime import UTC, datetime
 from pathlib import Path
 
 logging.basicConfig(level=logging.INFO, format="%(levelname)s | %(message)s")
@@ -83,7 +82,7 @@ def run_mock_evaluation() -> dict:
     return {
         "metadata": {
             "evaluator": "ragas_batch_mock",
-            "timestamp": datetime.now(timezone.utc).isoformat(),
+            "timestamp": datetime.now(UTC).isoformat(),
             "total_cases": len(results),
         },
         "results": results,
@@ -114,7 +113,7 @@ def main():
     # Save JSON report
     reports_dir = ROOT_DIR / "reports"
     reports_dir.mkdir(exist_ok=True)
-    timestamp = datetime.now(timezone.utc).strftime("%Y%m%d_%H%M%S")
+    timestamp = datetime.now(UTC).strftime("%Y%m%d_%H%M%S")
     output_path = reports_dir / f"ragas_eval_{timestamp}.json"
 
     with open(output_path, "w") as f:

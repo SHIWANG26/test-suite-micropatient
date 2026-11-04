@@ -35,6 +35,7 @@ jobs:
         with:
           python-version: '3.11'
           cache: 'pip'
+      - run: mkdir -p reports
       - run: pip install -e .
       - run: pytest evals/ -m llm_eval --tb=short -v --junitxml=reports/eval.xml
         env:
@@ -55,6 +56,7 @@ jobs:
         with:
           python-version: '3.11'
           cache: 'pip'
+      - run: mkdir -p reports
       - run: pip install -e .
       - run: pytest safety/ -m safety --tb=short -v --junitxml=reports/safety.xml
       - uses: actions/upload-artifact@v4
@@ -73,6 +75,7 @@ jobs:
         with:
           python-version: '3.11'
           cache: 'pip'
+      - run: mkdir -p reports
       - run: pip install -e .
       - run: pytest tests/api/ -m api --tb=short -v --junitxml=reports/api.xml
       - uses: actions/upload-artifact@v4
@@ -91,6 +94,7 @@ jobs:
         with:
           python-version: '3.11'
           cache: 'pip'
+      - run: mkdir -p reports
       - run: pip install -e .
       - run: pytest tests/data_validation/ -m data_validation --tb=short -v --junitxml=reports/data.xml
       - uses: actions/upload-artifact@v4
@@ -111,6 +115,7 @@ jobs:
           python-version: '3.11'
           cache: 'pip'
       - run: |
+          mkdir -p reports
           pip install -e .
           playwright install chromium --with-deps
       - run: pytest tests/ui/ -m ui --tb=short -v --junitxml=reports/ui.xml

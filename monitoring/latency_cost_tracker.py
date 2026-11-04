@@ -13,7 +13,7 @@ from __future__ import annotations
 import json
 import logging
 from dataclasses import asdict, dataclass
-from datetime import datetime, timezone
+from datetime import UTC, datetime
 from pathlib import Path
 
 logging.basicConfig(level=logging.INFO, format="%(levelname)s | %(message)s")
@@ -71,7 +71,7 @@ def _mock_metrics() -> LatencyCostSnapshot:
         alerts.append(f"❌ Error rate {error_rate:.1%} exceeds 1% threshold")
 
     return LatencyCostSnapshot(
-        timestamp=datetime.now(timezone.utc).isoformat(),
+        timestamp=datetime.now(UTC).isoformat(),
         api_latency_p50_ms=245.0,
         api_latency_p95_ms=p95,
         api_latency_p99_ms=p99,
@@ -88,7 +88,7 @@ def _live_metrics() -> LatencyCostSnapshot:
     try:
         import boto3
 
-        cw = boto3.client("cloudwatch", region_name="us-east-1")
+        boto3.client("cloudwatch", region_name="us-east-1")
 
         # Query CloudWatch metrics...
         # (Simplified — production code would use get_metric_statistics)
@@ -107,8 +107,8 @@ def main():
 
     snapshot = collect_metrics(mode="mock")
 
-    logger.info(f"\n{'='*60}")
-    logger.info(f"  Micropatient — Latency & Cost Report")
+    logger.info(f"\n{'=' * 60}")
+    logger.info("  Micropatient — Latency & Cost Report")
     logger.info(f"  {snapshot.timestamp}")
     logger.info(f"{'='*60}")
     logger.info(f"  API Latency  P50: {snapshot.api_latency_p50_ms:>8.1f} ms")

@@ -8,7 +8,6 @@ the golden dataset.
 See: https://promptfoo.dev/docs/providers/python/
 """
 
-import json
 import sys
 from pathlib import Path
 

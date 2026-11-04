@@ -7,7 +7,7 @@ Uses web-first locators (roles, labels) for resilience.
 
 from __future__ import annotations
 
-from playwright.sync_api import Page, expect
+from playwright.sync_api import Page
 
 from config.settings import get_settings
 from tests.ui.pages.base_page import BasePage

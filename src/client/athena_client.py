@@ -200,7 +200,7 @@ class AthenaClient:
             elapsed = (time.perf_counter() - start) * 1000
 
             columns = [desc[0] for desc in cursor.description] if cursor.description else []
-            rows = [dict(zip(columns, row)) for row in cursor.fetchall()]
+            rows = [dict(zip(columns, row, strict=False)) for row in cursor.fetchall()]
 
             return QueryResult(
                 rows=rows,

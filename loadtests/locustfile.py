@@ -17,6 +17,6 @@ Usage:
 """
 
 # Import all scenario classes — Locust auto-discovers HttpUser subclasses
-from loadtests.scenarios.patient_browsing import PatientBrowsingUser  # noqa: F401
-from loadtests.scenarios.chat_conversation import ChatConversationUser  # noqa: F401
 from loadtests.scenarios.api_stress import APIStressUser  # noqa: F401
+from loadtests.scenarios.chat_conversation import ChatConversationUser  # noqa: F401
+from loadtests.scenarios.patient_browsing import PatientBrowsingUser  # noqa: F401
