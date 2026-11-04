@@ -1,0 +1,46 @@
+name: 🎭 UI Test Gate
+
+on:
+  push:
+    branches: [main, develop]
+    paths:
+      - 'tests/ui/**'
+      - 'src/**'
+  pull_request:
+    branches: [main]
+
+jobs:
+  ui-tests:
+    name: Playwright UI Tests
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+          cache: 'pip'
+
+      - name: Install dependencies
+        run: |
+          pip install -e .
+          playwright install chromium --with-deps
+
+      - name: Run Playwright UI tests
+        run: pytest tests/ui/ -m ui --tb=short -v --junitxml=reports/ui-results.xml
+        env:
+          MICROPATIENT_UI_URL: ${{ secrets.STAGING_UI_URL }}
+
+      - name: Upload UI test reports
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: ui-test-reports
+          path: |
+            reports/
+            test-results/
+          retention-days: 30

@@ -1,0 +1,148 @@
+name: 🚀 Full Quality Pipeline
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  # ── Stage 1: Lint ─────────────────────────────
+  lint:
+    name: Code Quality
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+          cache: 'pip'
+      - run: pip install ruff
+      - run: ruff check . --output-format=github
+
+  # ── Stage 2: Unit/Eval Tests (parallel) ───────
+  llm-eval:
+    name: LLM Evaluation
+    needs: lint
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+          cache: 'pip'
+      - run: pip install -e .
+      - run: pytest evals/ -m llm_eval --tb=short -v --junitxml=reports/eval.xml
+        env:
+          OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: eval-reports
+          path: reports/
+
+  safety:
+    name: AI Safety
+    needs: lint
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+          cache: 'pip'
+      - run: pip install -e .
+      - run: pytest safety/ -m safety --tb=short -v --junitxml=reports/safety.xml
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: safety-reports
+          path: reports/
+
+  api-tests:
+    name: API Tests
+    needs: lint
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+          cache: 'pip'
+      - run: pip install -e .
+      - run: pytest tests/api/ -m api --tb=short -v --junitxml=reports/api.xml
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: api-reports
+          path: reports/
+
+  data-validation:
+    name: Data Validation
+    needs: lint
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+          cache: 'pip'
+      - run: pip install -e .
+      - run: pytest tests/data_validation/ -m data_validation --tb=short -v --junitxml=reports/data.xml
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: data-reports
+          path: reports/
+
+  # ── Stage 3: Integration Tests ────────────────
+  ui-tests:
+    name: UI Tests
+    needs: [llm-eval, safety, api-tests]
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+          cache: 'pip'
+      - run: |
+          pip install -e .
+          playwright install chromium --with-deps
+      - run: pytest tests/ui/ -m ui --tb=short -v --junitxml=reports/ui.xml
+        env:
+          MICROPATIENT_UI_URL: ${{ secrets.STAGING_UI_URL }}
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: ui-reports
+          path: reports/
+
+  # ── Stage 4: Quality Gate Decision ────────────
+  quality-gate:
+    name: ✅ Quality Gate
+    needs: [llm-eval, safety, api-tests, data-validation, ui-tests]
+    runs-on: ubuntu-latest
+    if: always()
+    steps:
+      - name: Check all gates passed
+        run: |
+          echo "🧪 LLM Eval:       ${{ needs.llm-eval.result }}"
+          echo "🛡️ Safety:          ${{ needs.safety.result }}"
+          echo "🌐 API Tests:       ${{ needs.api-tests.result }}"
+          echo "📊 Data Validation: ${{ needs.data-validation.result }}"
+          echo "🎭 UI Tests:        ${{ needs.ui-tests.result }}"
+
+          if [ "${{ needs.llm-eval.result }}" != "success" ] || \
+             [ "${{ needs.safety.result }}" != "success" ] || \
+             [ "${{ needs.api-tests.result }}" != "success" ] || \
+             [ "${{ needs.data-validation.result }}" != "success" ]; then
+            echo "❌ Quality gate FAILED — blocking deployment"
+            exit 1
+          fi
+
+          echo "✅ All quality gates passed — ready for deployment"

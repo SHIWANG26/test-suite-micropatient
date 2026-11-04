@@ -1,0 +1,41 @@
+name: 🌐 API Test Gate
+
+on:
+  push:
+    branches: [main, develop]
+    paths:
+      - 'tests/api/**'
+      - 'src/client/**'
+      - 'data/api/**'
+  pull_request:
+    branches: [main]
+
+jobs:
+  api-tests:
+    name: REST API Contract Tests
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+          cache: 'pip'
+
+      - name: Install dependencies
+        run: pip install -e .
+
+      - name: Run API contract tests
+        run: pytest tests/api/ -m api --tb=short -v --junitxml=reports/api-results.xml
+
+      - name: Upload API test reports
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: api-test-reports
+          path: reports/
+          retention-days: 30

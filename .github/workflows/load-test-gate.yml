@@ -1,0 +1,56 @@
+name: 🔥 Load Test Gate
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - 'loadtests/**'
+  workflow_dispatch:
+    inputs:
+      users:
+        description: 'Number of concurrent users'
+        required: true
+        default: '50'
+      duration:
+        description: 'Test duration (e.g., 5m, 10m)'
+        required: true
+        default: '5m'
+
+jobs:
+  load-tests:
+    name: Locust Load Tests
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+          cache: 'pip'
+
+      - name: Install dependencies
+        run: pip install -e .
+
+      - name: Run Locust load tests
+        run: |
+          locust -f loadtests/locustfile.py \
+            --headless \
+            -u ${{ github.event.inputs.users || '50' }} \
+            -r 5 \
+            --run-time ${{ github.event.inputs.duration || '5m' }} \
+            --host ${{ secrets.STAGING_API_URL || 'http://localhost:8000' }} \
+            --html reports/locust_report.html \
+            --csv reports/locust_stats
+        continue-on-error: true
+
+      - name: Upload load test reports
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: load-test-reports
+          path: reports/
+          retention-days: 30

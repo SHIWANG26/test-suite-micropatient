@@ -1,0 +1,50 @@
+name: 🛡️ AI Safety Gate
+
+on:
+  push:
+    branches: [main, develop]
+    paths:
+      - 'safety/**'
+      - 'data/safety/**'
+      - 'src/**'
+  pull_request:
+    branches: [main]
+
+jobs:
+  safety-tests:
+    name: AI Safety Tests
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+          cache: 'pip'
+
+      - name: Install dependencies
+        run: pip install -e .
+
+      - name: Run prompt injection tests
+        run: pytest safety/test_prompt_injection.py -m safety --tb=short -v
+
+      - name: Run jailbreak resistance tests
+        run: pytest safety/test_jailbreak.py -m safety --tb=short -v
+
+      - name: Run PII leakage tests
+        run: pytest safety/test_pii_leakage.py -m safety --tb=short -v
+
+      - name: Run blocked topic tests
+        run: pytest safety/test_blocked_topics.py -m safety --tb=short -v
+
+      - name: Upload safety reports
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: safety-reports
+          path: reports/
+          retention-days: 30

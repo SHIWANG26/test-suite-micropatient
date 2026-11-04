@@ -1,0 +1,51 @@
+name: 🧪 LLM Evaluation Gate
+
+on:
+  push:
+    branches: [main, develop]
+    paths:
+      - 'evals/**'
+      - 'data/golden_dataset/**'
+      - 'src/**'
+      - 'config/**'
+  pull_request:
+    branches: [main]
+    paths:
+      - 'evals/**'
+      - 'data/golden_dataset/**'
+
+jobs:
+  llm-evaluation:
+    name: LLM Evaluation (DeepEval + Ragas)
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+          cache: 'pip'
+
+      - name: Install dependencies
+        run: pip install -e ".[dev]"
+
+      - name: Run DeepEval evaluation tests
+        env:
+          OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
+          DEEPEVAL_API_KEY: ${{ secrets.DEEPEVAL_API_KEY }}
+        run: pytest evals/ -m llm_eval --tb=short -v --junitxml=reports/eval-results.xml
+
+      - name: Run Ragas batch evaluation
+        run: python evals/ragas_batch_eval.py
+
+      - name: Upload evaluation reports
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: llm-eval-reports
+          path: reports/
+          retention-days: 30

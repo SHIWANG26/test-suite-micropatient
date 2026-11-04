@@ -1,0 +1,72 @@
+{
+  "widgets": [
+    {
+      "type": "metric",
+      "properties": {
+        "title": "Micropatient API — Request Latency (p95)",
+        "metrics": [
+          ["AWS/ApiGateway", "Latency", "ApiName", "MicropatientAPI", {"stat": "p95", "period": 300}]
+        ],
+        "view": "timeSeries",
+        "region": "us-east-1"
+      }
+    },
+    {
+      "type": "metric",
+      "properties": {
+        "title": "Micropatient API — Error Rate (5xx)",
+        "metrics": [
+          ["AWS/ApiGateway", "5XXError", "ApiName", "MicropatientAPI", {"stat": "Sum", "period": 300}]
+        ],
+        "view": "timeSeries",
+        "region": "us-east-1"
+      }
+    },
+    {
+      "type": "metric",
+      "properties": {
+        "title": "LLM Token Usage — Total Tokens",
+        "metrics": [
+          ["Micropatient/LLM", "TotalTokens", "Model", "gpt-4o", {"stat": "Sum", "period": 3600}]
+        ],
+        "view": "timeSeries",
+        "region": "us-east-1"
+      }
+    },
+    {
+      "type": "metric",
+      "properties": {
+        "title": "LLM Cost — Hourly USD",
+        "metrics": [
+          ["Micropatient/LLM", "CostUSD", "Model", "gpt-4o", {"stat": "Sum", "period": 3600}]
+        ],
+        "view": "singleValue",
+        "region": "us-east-1"
+      }
+    },
+    {
+      "type": "metric",
+      "properties": {
+        "title": "RAG Retrieval Latency",
+        "metrics": [
+          ["Micropatient/RAG", "RetrievalLatency", {"stat": "p50", "period": 300}],
+          ["Micropatient/RAG", "RetrievalLatency", {"stat": "p95", "period": 300}],
+          ["Micropatient/RAG", "RetrievalLatency", {"stat": "p99", "period": 300}]
+        ],
+        "view": "timeSeries",
+        "region": "us-east-1"
+      }
+    },
+    {
+      "type": "metric",
+      "properties": {
+        "title": "Athena Query Execution Time",
+        "metrics": [
+          ["AWS/Athena", "TotalExecutionTime", "WorkGroup", "primary", {"stat": "Average", "period": 300}]
+        ],
+        "view": "timeSeries",
+        "region": "us-east-1"
+      }
+    }
+  ]
+}
